@@ -1,0 +1,22 @@
+Name:                     coworking-db-postgresql
+Namespace:                default
+Labels:                   app.kubernetes.io/component=primary
+                          app.kubernetes.io/instance=coworking-db
+                          app.kubernetes.io/managed-by=Helm
+                          app.kubernetes.io/name=postgresql
+                          app.kubernetes.io/version=18.1.0
+                          helm.sh/chart=postgresql-18.1.13
+Annotations:              meta.helm.sh/release-name: coworking-db
+                          meta.helm.sh/release-namespace: default
+Selector:                 app.kubernetes.io/component=primary,app.kubernetes.io/instance=coworking-db,app.kubernetes.io/name=postgresql
+Type:                     ClusterIP
+IP Family Policy:         SingleStack
+IP Families:              IPv4
+IP:                       10.100.84.150
+IPs:                      10.100.84.150
+Port:                     tcp-postgresql  5432/TCP
+TargetPort:               tcp-postgresql/TCP
+Endpoints:                192.168.46.177:5432
+Session Affinity:         None
+Internal Traffic Policy:  Cluster
+Events:                   <none>

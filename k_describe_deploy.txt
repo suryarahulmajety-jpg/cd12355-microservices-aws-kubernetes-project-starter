@@ -1,0 +1,38 @@
+Name:                   coworking
+Namespace:              default
+CreationTimestamp:      Fri, 12 Dec 2025 20:39:02 +0530
+Labels:                 <none>
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=coworking
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=coworking
+  Containers:
+   coworking:
+    Image:      522062037927.dkr.ecr.us-east-1.amazonaws.com/coworking-space:1.0.0
+    Port:       5153/TCP
+    Host Port:  0/TCP
+    Liveness:   http-get http://:5153/health_check delay=5s timeout=1s period=10s #success=1 #failure=3
+    Readiness:  http-get http://:5153/readiness_check delay=5s timeout=1s period=10s #success=1 #failure=3
+    Environment Variables from:
+      coworking-config  ConfigMap  Optional: false
+      coworking-secret  Secret     Optional: false
+    Environment:        <none>
+    Mounts:             <none>
+  Volumes:              <none>
+  Node-Selectors:       <none>
+  Tolerations:          <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   coworking-7f9db8b797 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  60m   deployment-controller  Scaled up replica set coworking-7f9db8b797 from 0 to 1

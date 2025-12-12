@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: coworking
-        image: <ECR_IMAGE_URI_WILL_BE_ADDED_LATER>
+        image: 522062037927.dkr.ecr.us-east-1.amazonaws.com/coworking-space:1.0.0
         ports:
         - containerPort: 5153
         envFrom:

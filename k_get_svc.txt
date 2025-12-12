@@ -1,0 +1,5 @@
+NAME                         TYPE           CLUSTER-IP      EXTERNAL-IP                                                               PORT(S)          AGE    SELECTOR
+coworking                    LoadBalancer   10.100.14.210   a88b75e05bb1d40d58f9904edb74c893-1067330634.us-east-1.elb.amazonaws.com   5153:30895/TCP   60m    app=coworking
+coworking-db-postgresql      ClusterIP      10.100.84.150   <none>                                                                    5432/TCP         111m   app.kubernetes.io/component=primary,app.kubernetes.io/instance=coworking-db,app.kubernetes.io/name=postgresql
+coworking-db-postgresql-hl   ClusterIP      None            <none>                                                                    5432/TCP         111m   app.kubernetes.io/component=primary,app.kubernetes.io/instance=coworking-db,app.kubernetes.io/name=postgresql
+kubernetes                   ClusterIP      10.100.0.1      <none>                                                                    443/TCP          21h    <none>

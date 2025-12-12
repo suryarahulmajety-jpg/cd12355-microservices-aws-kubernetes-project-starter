@@ -1,0 +1,3 @@
+NAME                         READY   STATUS    RESTARTS   AGE    IP               NODE                            NOMINATED NODE   READINESS GATES
+coworking-7f9db8b797-x8rfx   1/1     Running   0          60m    192.168.37.179   ip-192-168-34-11.ec2.internal   <none>           <none>
+coworking-db-postgresql-0    1/1     Running   0          111m   192.168.46.177   ip-192-168-34-11.ec2.internal   <none>           <none>
