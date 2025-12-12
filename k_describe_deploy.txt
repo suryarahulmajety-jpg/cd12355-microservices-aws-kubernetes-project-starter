@@ -32,7 +32,4 @@ Conditions:
   Progressing    True    NewReplicaSetAvailable
 OldReplicaSets:  <none>
 NewReplicaSet:   coworking-7f9db8b797 (1/1 replicas created)
-Events:
-  Type    Reason             Age   From                   Message
-  ----    ------             ----  ----                   -------
-  Normal  ScalingReplicaSet  60m   deployment-controller  Scaled up replica set coworking-7f9db8b797 from 0 to 1
+Events:          <none>
