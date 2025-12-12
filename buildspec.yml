@@ -1,12 +1,23 @@
 version: 0.2
+
+env:
+  variables:
+    AWS_REGION: "us-east-1"
+    ACCOUNT_ID: "522062037927"
 phases:
   pre_build:
     commands:
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 522062037927.dkr.ecr.us-east-1.amazonaws.com
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
   build:
     commands:
-      - docker build -t coworking-app .
-      - docker tag coworking-app:latest 522062037927.dkr.ecr.us-east-1.amazonaws.com/coworking-space:$CODEBUILD_BUILD_NUMBER
+      - echo Build started on `date`
+      - docker build -t coworking-app -f analytics/Dockerfile ./analytics
+      - docker tag coworking-app:latest $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/coworking-space:$CODEBUILD_BUILD_NUMBER
   post_build:
     commands:
-      - docker push 522062037927.dkr.ecr.us-east-1.amazonaws.com/coworking-space:$CODEBUILD_BUILD_NUMBER
+      - echo Build completed on `date`
+      - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/coworking-space:$CODEBUILD_BUILD_NUMBER
+artifacts:
+  files:
+    - '**/*'
