@@ -1,124 +1,94 @@
-Coworking Space Analytics App 
+# Coworking Space Service – Analytics Extension (EKS)
 
-Hi! This repo contains my submission for the *Udacity Cloud Developer Nanodegree — Microservices on AWS with Kubernetes* final project.  
-This app exposes analytics APIs (daily usage + user visits) and runs fully on **Amazon EKS**, using:
+## Overview
 
-- ECR (Docker image registry)
-- EKS (Kubernetes cluster)
-- Helm (for PostgreSQL)
-- CodeBuild (CI build + Docker push)
-- LoadBalancer service (public access)
+The Coworking Space Service is a microservice-based application that allows users to request one-time access tokens and enables administrators to authorize access to a coworking space.  
+This repository focuses on the **Analytics Service**, which exposes APIs used by business analysts to retrieve usage metrics such as daily visits and user-based activity.
 
- 1. Project Overview
-
-This project is a simple analytics microservice written in Python (Flask).  
-It connects to **PostgreSQL**, fetches seeded data, and exposes two API endpoints:
-
-- `/api/reports/daily_usage`  
-- `/api/reports/user_visits`
-
-The backend runs inside a Docker container deployed on AWS EKS
-
-Docker Build & Push Steps
-
-```sh
-docker build -t coworking-app:1.0.0 -f analytics/Dockerfile .
-```
-
-Tag it for ECR
-
-```sh
-docker tag coworking-app:1.0.0 \
-522062037927.dkr.ecr.us-east-1.amazonaws.com/coworking-space:1.0.0
-```
-
-Login to ECR
-
-```sh
-aws ecr get-login-password --region us-east-1 \
-| docker login --username AWS \
-  --password-stdin 522062037927.dkr.ecr.us-east-1.amazonaws.com
-```
-
-Push image
-
-```sh
-docker push 522062037927.dkr.ecr.us-east-1.amazonaws.com/coworking-space:1.0.0
-```
+In this project, I worked as a **DevOps engineer**, responsible for containerizing the analytics application, building a CI/CD pipeline, and deploying the service into a **Kubernetes environment on AWS EKS**.
 
 ---
 
-PostgreSQL Setup on Kubernetes
+## System Architecture
 
-Deployed Postgres in EKS using the Bitnami Helm chart
+The system follows a cloud-native, microservice-oriented design:
 
-```sh
-helm install coworking-db bitnami/postgresql \
-  --set auth.username=rahul \
-  --set auth.password=Welcome_123 \
-  --set auth.database=coworking \
-  --set persistence.enabled=false \
-  --set primary.persistence.enabled=false \
-  --set readReplicas.persistence.enabled=false
-```
+- **Analytics API**
+  - Python (Flask) application
+  - Containerized using Docker
+  - Deployed as a Kubernetes Deployment
+- **Database**
+  - PostgreSQL deployed using a Bitnami Helm chart
+  - Runs inside the same Kubernetes cluster
+- **Container Registry**
+  - Amazon ECR stores versioned Docker images
+- **CI/CD Pipeline**
+  - GitHub triggers AWS CodeBuild via webhook
+  - CodeBuild builds and pushes Docker images to ECR
+- **Orchestration & Runtime**
+  - Amazon EKS manages application and database workloads
+- **Observability**
+  - Application logs available via Kubernetes
+  - Infrastructure and build logs available in CloudWatch
 
-Verify the DB pod is running
-
-```sh
-kubectl get pods -l app.kubernetes.io/name=postgresql
-```
-
-Port-forward to access PostgreSQL locally
-
-```sh
-kubectl port-forward svc/coworking-db-postgresql 5432:5432
-```
-
-Connect using psql 
-
-```sh
-psql -h 127.0.0.1 -U rahul -d coworking
-```
+An architecture diagram is included in the submission to illustrate component interactions.
 
 ---
 
-Database Seeding
+## Technology Stack
 
-The `db/seed.sql` file contains test analytics + visit data.
+- Python (Flask)
+- Docker
+- Kubernetes
+- Helm
+- Amazon EKS
+- Amazon ECR
+- AWS CodeBuild
+- AWS CloudWatch
+- GitHub Webhooks
 
-To seed the DB:
+---
 
-```sh
-kubectl run pg-client --rm -it --image=postgres:14 -- bash
-```
+## CI/CD Workflow
 
-Inside the pod:
+The deployment pipeline is fully automated and GitHub-driven:
 
-```sh
-psql -h coworking-db-postgresql -U rahul -d coworking -f /seed/seed.sql
-```
- Kubernetes Deployment Manifests
+1. A code change is pushed to the GitHub repository.
+2. A GitHub webhook triggers an AWS CodeBuild project.
+3. CodeBuild:
+   - Builds the Docker image using `buildspec.yml`
+   - Tags the image with a build-based version
+   - Pushes the image to Amazon ECR
+4. The Kubernetes deployment references the updated image from ECR.
+5. Pods are recreated automatically by Kubernetes using a rolling update strategy.
 
-The Kubernetes YAMLs used in this project are stored under:
+This workflow ensures consistent, repeatable, and auditable deployments.
 
-```
-deployments/configmap.yaml
-deployments/secret.yaml
-deployments/deployment.yaml
-```
+---
 
-Apply them:
+## Kubernetes Deployment Strategy
 
-```sh
-kubectl apply -f deployments/configmap.yaml
-kubectl apply -f deployments/secret.yaml
-kubectl apply -f deployments/deployment.yaml
-``'
-```
+All Kubernetes manifests used for deployment are stored in the `deployments/` directory:
 
-The app exposes a **LoadBalancer** service that looks like:
+- `deployment.yaml` – Analytics application deployment
+- `configmap.yaml` – Runtime configuration
+- `secret.yaml` – Database credentials
+- PostgreSQL deployed via Helm
 
-```
-a88b75e05bb1d40d58f9904edb74c893-xxxxxxxx.elb.amazonaws.com
-```
+The application uses:
+- Liveness and readiness probes for health checks
+- ConfigMaps and Secrets for environment configuration
+- ClusterIP services for internal communication
 
+---
+
+## Application Logging & Observability
+
+The analytics service continuously queries the database and logs runtime information, including query execution and health checks.
+
+### Log Collection Approach
+
+Application logs are retrieved using:
+
+```bash
+kubectl logs -l app=coworking
